@@ -22,7 +22,7 @@ class Player
 
     public void Draw(float playerDeltaX, float playerDeltaY)
     {
-        GL.Color3(1f, 0f, 0f);
+        GL.Color3(0f, 0f, 1f);
         GL.Begin(PrimitiveType.Quads);
         GL.Vertex2(Position.X, Position.Y); //Left top 
         GL.Vertex2(Position.X + PlayerWidth, Position.Y); //Right top
@@ -33,7 +33,14 @@ class Player
         GL.LineWidth(3f);
         GL.Begin(PrimitiveType.Lines);
         GL.Vertex2(Position.X + (PlayerWidth / 2), Position.Y + (PlayerWidth / 2));
-        GL.Vertex2(Position.X + playerDeltaX * 5, Position.Y + playerDeltaY * 5);
+        GL.Vertex2(Position.X + (playerDeltaX * 6.5) + (PlayerWidth / 2), Position.Y + (playerDeltaY * 6.5) + (PlayerWidth / 2));
+        GL.End();
+
+        GL.Color3(1f, 0f, 0f);
+        GL.LineWidth(1f);
+        GL.Begin(PrimitiveType.Lines);
+        GL.Vertex2(Position.X + (PlayerWidth / 2), Position.Y + (PlayerWidth / 2));
+        GL.Vertex2(Position.X + (playerDeltaX * 100) + (PlayerWidth / 2), Position.Y + (playerDeltaY * 100) + (PlayerWidth / 2));
         GL.End();
     }
 }

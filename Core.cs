@@ -12,15 +12,16 @@ class Core
     {
         //Reading map from file, checking for errors and giving it to a 2D array
         var (map, errors) = Map.Read();
-        int tileSize = 64;
+        int tileSize = 48;
 
         if (errors.Count > 0) return;
 
         int DebugScreenWidth = map.GetLength(1) * tileSize;
         int DebugScreenHeight = map.GetLength(0) * tileSize;
 
-        //Player movement speed
-        float speed = 40f;
+        //Player speed
+        float movementSpeed = 40f;
+        float rotationSpeed = 0.05f;
 
         //Delta elapsed time variable
         float lastTime = 0.0167f;
@@ -52,20 +53,79 @@ class Core
 
                 lastTime = currentTime;
 
-                float movementSpeed = speed * deltaTime;
+                float deltaMovementSpeed = movementSpeed * deltaTime;
+                float deltaRotationSpeed = rotationSpeed * deltaTime;
 
                 var keyboard = Keyboard.GetState();
 
-                if (keyboard.IsKeyDown(Key.A)) { playerAngle -= 0.1f; if (playerAngle < 0) { playerAngle += 2 * PI; } playerDeltaX = (float)Math.Cos(playerAngle) * 5; playerDeltaY = (float)Math.Sin(playerAngle) * 5; }
-                ;
-                if (keyboard.IsKeyDown(Key.W)) player.Position.Y -= movementSpeed;
-                if (keyboard.IsKeyDown(Key.S)) player.Position.Y += movementSpeed;
-                if (keyboard.IsKeyDown(Key.D)) player.Position.X += movementSpeed;
+                //Forward
+                if (keyboard.IsKeyDown(Key.W)) {
+                    player.Position.X += playerDeltaX;
+                    player.Position.Y += playerDeltaY;
+                };
 
+                //Strife left
+                if (keyboard.IsKeyDown(Key.A)) {
+                    playerAngle -= rotationSpeed;
+                    if (playerAngle < 0) {
+                        playerAngle += 2 * PI;
+                    }
+                    playerDeltaX = (float)Math.Cos(playerAngle) * 5;
+                    playerDeltaY = (float)Math.Sin(playerAngle) * 5;
+                };
+
+                //Backward
+                if (keyboard.IsKeyDown(Key.S)) {
+                    player.Position.X -= playerDeltaX;
+                    player.Position.Y -= playerDeltaY;
+                };
+
+                //Strife right
+                if (keyboard.IsKeyDown(Key.D)) {
+                    playerAngle += rotationSpeed;
+                    if (playerAngle > 2 * PI) {
+                        playerAngle -= 2 * PI;
+                    }
+                    playerDeltaX = (float)Math.Cos(playerAngle) * 5;
+                    playerDeltaY = (float)Math.Sin(playerAngle) * 5;
+                };
+                /*
+                //View angle
+                //Up
+                if (playerAngle >= PI / 4 && playerAngle < (3 * PI) / 4) {
+                
+                };
+                
+                //Left
+                if (playerAngle >= (3 * PI) / 4 && playerAngle < (5 * PI) / 4) {
+                
+                };
+
+                //Down
+                if (playerAngle >= (5 *PI) / 4 && playerAngle < (7 * PI) / 4) {
+                
+                };
+                
+                //Right
+                if (playerAngle >= (7 * PI) / 4 && playerAngle < PI / 4) {
+                
+                };
+                */
+
+                int playerOnMapX = (int)Math.Floor(player.Position.X / tileSize);
+                int playerOnMapY = (int)Math.Floor(player.Position.Y / tileSize);
+                
+                while (map[(playerOnMapX - 1), playerOnMapY] != 1) {
+                    playerOnMapX += 1;
+                };
+
+                playerOnMapX -= ((int)Math.Floor(player.Position.X / tileSize) + 1);
+                
+                Console.WriteLine("playerOnMapX: " + (int)Math.Floor(player.Position.X / tileSize) + "\nExtendedX: " + (playerOnMapX * tileSize + player.Position.X));
+                
                 GL.ClearColor(0.6f, 0.6f, 0.6f, 1f);
                 GL.Clear(ClearBufferMask.ColorBufferBit);
-                Console.WriteLine("playerAngle: " + playerAngle + "\nplayerDeltaX: " + playerDeltaX + "\nplayerDeltaY: " + playerDeltaY);
-
+                
                 Map.Draw(DebugScreen, map, tileSize);
                 player.Draw(playerDeltaX, playerDeltaY);
 
