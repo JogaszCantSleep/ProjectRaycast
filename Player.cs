@@ -24,7 +24,7 @@ class Player
     {
         GL.Color3(1f, 0f, 0f);
         GL.Begin(PrimitiveType.Quads);
-        GL.Vertex2(Position.X, Position.Y); //Left top
+        GL.Vertex2(Position.X, Position.Y); //Left top 
         GL.Vertex2(Position.X + PlayerWidth, Position.Y); //Right top
         GL.Vertex2(Position.X + PlayerWidth, Position.Y + PlayerHeight); //Right bottom
         GL.Vertex2(Position.X, Position.Y + PlayerHeight); //Left bottom
