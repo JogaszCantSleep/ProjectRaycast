@@ -1,5 +1,6 @@
 ﻿using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using System;
 using System.Security.Policy;
 
 class Player
@@ -19,7 +20,7 @@ class Player
     }
 
     //Drawing player
-    public void Draw(float playerDeltaX, float playerDeltaY)
+    public void Draw()
     {
         GL.Color3(0f, 0f, 1f);
         GL.Begin(PrimitiveType.Quads);
