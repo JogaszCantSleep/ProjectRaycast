@@ -120,9 +120,9 @@ class Engine
                 //Y ahonna rajzolunk
                 tempPlayerPositionY = player.Position.Y;
                 //Amennyivel eltoljuk az X-et
-                tempPositionX = tempPlayerPositionX % tileSize;
+                tempPositionX = tileSize - (tempPlayerPositionX % tileSize);
                 //Amennyivel eltoljuk az Y-t
-                tempPositionY = tempPositionX * (float)Math.Tan((2 * PI) - playerViewAngle);
+                tempPositionY = (tileSize - (player.Position.X % tileSize)) * (float)Math.Tan((2 * PI) - playerViewAngle);
 
                 //Casting the lazerz (I'KNOW IT'S A RAY OKAY?...)
 
@@ -133,53 +133,57 @@ class Engine
                 int mapCheckingRow = (int)(tempPlayerPositionY / tileSize);
                 int mapCheckingCol = (int)(tempPlayerPositionX / tileSize) + 1;
 
+                int tempIterator = 1;
 
                 //If view angle is between 0 and PI/2 (1. quadrant)
                 while (mapCheckingCol < map.GetLength(1) && !isVerticalFound)
                 {
-                    GL.Color3(1f, 0f, 0f);
-                    GL.LineWidth(1f);
-                    GL.Begin(PrimitiveType.Triangles);
-                    GL.Vertex2(tempPlayerPositionX, tempPlayerPositionY);
-                    GL.Vertex2(tempPlayerPositionX + tempPositionX, tempPlayerPositionY);
-                    GL.Vertex2(tempPlayerPositionX + tempPositionX, tempPlayerPositionY + tempPositionY);
-                    GL.End();
                     if (map[mapCheckingRow, mapCheckingCol] == 1)
                     {
-
-                        GL.Color3(1f, 0f, 0f);
-                        GL.LineWidth(1f);
-                        GL.Begin(PrimitiveType.Lines);
-                        GL.Vertex2(player.Position.X, player.Position.Y);
-                        GL.Vertex2(player.Position.X + playerDeltaMovementX * 100, player.Position.Y + playerDeltaMovementY * 100);
-                        GL.End();
-                        isVerticalFound = true;
-                    }
-                    else
-                    {
-                        Console.WriteLine("=======================");
-                        Console.WriteLine("playerViewAngle: " + ((2 * PI) - playerViewAngle));
-                        Console.WriteLine("tempPlayerPositionX: " + tempPlayerPositionX);
-                        Console.WriteLine("tempPlayerPositionY: " + tempPlayerPositionY);
-                        Console.WriteLine("tempPositionX: " + tempPositionX);
-                        Console.WriteLine("tempPositionY: " + tempPositionY);
-
                         GL.Color3(1f, 0f, 0f);
                         GL.LineWidth(1f);
                         GL.Begin(PrimitiveType.Triangles);
                         GL.Vertex2(tempPlayerPositionX, tempPlayerPositionY);
                         GL.Vertex2(tempPlayerPositionX + tempPositionX, tempPlayerPositionY);
-                        GL.Vertex2(tempPlayerPositionX + tempPositionX, tempPlayerPositionY + tempPositionY);
+                        GL.Vertex2(tempPlayerPositionX + tempPositionX, tempPlayerPositionY - tempPositionY);
                         GL.End();
 
-                        //X ahonnan rajzolunk
-                        tempPlayerPositionX += tempPositionX;
-                        //Y ahonna rajzolunk
-                        tempPlayerPositionY += tempPositionY;
+                        GL.Color3(1f, 0f, 0f);
+                        GL.LineWidth(1f);
+                        GL.Begin(PrimitiveType.Lines);
+                        GL.Vertex2(player.Position.X, player.Position.Y);
+                        GL.Vertex2(player.Position.X + playerDeltaMovementX * 1000, player.Position.Y + playerDeltaMovementY * 1000);
+                        GL.End();
+                        isVerticalFound = true;
+                    }
+                    else
+                    {
+                        
+                        GL.Color3(1f, 0f, 0f);
+                        GL.LineWidth(1f);
+                        GL.Begin(PrimitiveType.Triangles);
+                        GL.Vertex2(tempPlayerPositionX, tempPlayerPositionY);
+                        GL.Vertex2(tempPlayerPositionX + tempPositionX, tempPlayerPositionY);
+                        GL.Vertex2(tempPlayerPositionX + tempPositionX, tempPlayerPositionY - tempPositionY);
+                        GL.End();
+
+                        Console.WriteLine("=================================");
+                        Console.WriteLine("Kör: " + tempIterator);
+                        Console.WriteLine("tempPlayerPositionX: " + tempPlayerPositionX);
+                        Console.WriteLine("tempPlayerPositionY: " + tempPlayerPositionY);
+                        Console.WriteLine("tempPositionX: " + tempPositionX);
+                        Console.WriteLine("tempPositionY: " + tempPositionY);
+
+                        tempIterator += 1;
+
                         //Amennyivel eltoljuk az X-et
                         tempPositionX = tileSize;
+                        //Y ahonna rajzolunk
+                        tempPlayerPositionY -= (tileSize * (float)Math.Tan((2 * PI) - playerViewAngle));
+                        //X ahonnan rajzolunk
+                        tempPlayerPositionX += tileSize - (tempPlayerPositionX % tileSize);
                         //Amennyivel eltoljuk az Y-t
-                        tempPositionY += tempPositionX * (float)Math.Tan((2 * PI) - playerViewAngle);
+                        tempPositionY += tileSize * (float)Math.Tan((2 * PI) - playerViewAngle);
                         mapCheckingCol += 1;
                     }
                 };
