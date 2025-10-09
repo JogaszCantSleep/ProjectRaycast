@@ -30,8 +30,6 @@ class Engine
         int DebugScreenHeight = map.GetLength(0) * tileSize;
 
         //Player movement, speed and angle
-        float playerDeltaX = 1f;
-        float playerDeltaY = 0f;
         float movementSpeed = 100f;
         float playerAngle = 0f;
         float rotationSpeed = 2f;
@@ -44,6 +42,7 @@ class Engine
         stopWatch.Start();
 
         //Raycasting variables
+        int rayCount = 3;
         float tempOffsetX = 0;
         float tempOffsetY = 0;
         float tempPlayerPositionX = 0;
@@ -115,6 +114,18 @@ class Engine
                 Map.Draw(DebugScreen, map, tileSize);
                 player.Draw();
 
+                float rayOffset = -((rayCount / 2) * 1f);
+                for (int i = 0; i < rayCount; i++) {
+                    rayOffset += 1f;
+                    GL.Color3(1f, 0f, 0f);
+                    GL.LineWidth(1f);
+                    GL.Begin(PrimitiveType.Lines);
+                    GL.Vertex2(player.Position.X, player.Position.Y);
+                    GL.Vertex2(player.Position.X + (float)Math.Cos(playerAngle + rayOffset) * 300, player.Position.Y + (float)Math.Sin(playerAngle + rayOffset) * 300);
+                    GL.End();
+                }
+
+                /*
                 //Casting the rays
                 bool isVerticalFound = false;
                 bool isHorizontalFound = false;
@@ -150,7 +161,7 @@ class Engine
                             mapCheckingCol = (int)((tempPlayerPositionX + tempOffsetX) / tileSize);
                         }
                     };
-                }
+                }*/
 
                 DebugScreen.SwapBuffers();
             };
