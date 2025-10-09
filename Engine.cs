@@ -44,8 +44,8 @@ class Engine
         stopWatch.Start();
 
         //Raycasting variables
-        float tempPositionX = 0;
-        float tempPositionY = 0;
+        float tempOffsetX = 0;
+        float tempOffsetY = 0;
         float tempPlayerPositionX = 0;
         float tempPlayerPositionY = 0;
 
@@ -115,77 +115,37 @@ class Engine
                 Map.Draw(DebugScreen, map, tileSize);
                 player.Draw();
 
-                //X ahonnan rajzolunk
-                tempPlayerPositionX = player.Position.X;
-                //Y ahonna rajzolunk
-                tempPlayerPositionY = player.Position.Y;
-                //Amennyivel eltoljuk az X-et
-                tempPositionX = tileSize - (tempPlayerPositionX % tileSize);
-                //Amennyivel eltoljuk az Y-t
-                tempPositionY = (tileSize - (player.Position.X % tileSize)) * (float)Math.Tan((2 * PI) - playerViewAngle);
-
-                //Casting the lazerz (I'KNOW IT'S A RAY OKAY?...)
-
+                //Casting the rays
                 bool isVerticalFound = false;
                 bool isHorizontalFound = false;
 
-                //Casting rays until hitting a wall
-                int mapCheckingRow = (int)(tempPlayerPositionY / tileSize);
-                int mapCheckingCol = (int)(tempPlayerPositionX / tileSize) + 1;
+                tempPlayerPositionX = player.Position.X;
+                tempPlayerPositionY = player.Position.Y;
+                tempOffsetX = tileSize - (tempPlayerPositionX % tileSize);
+                tempOffsetY = (tileSize - (player.Position.X % tileSize)) * (float)Math.Tan((2 * PI) - playerViewAngle);
 
-                int tempIterator = 1;
+                int mapCheckingRow = (int)(player.Position.Y / tileSize);
+                int mapCheckingCol = (int)(player.Position.X / tileSize);
 
                 //If view angle is between 0 and PI/2 (1. quadrant)
                 while (mapCheckingCol < map.GetLength(1) && !isVerticalFound)
                 {
+                    mapCheckingRow = (int)((tempPlayerPositionY - tempOffsetY) / tileSize);
+                    mapCheckingCol = (int)((tempPlayerPositionX + tempOffsetX) / tileSize);
                     if (map[mapCheckingRow, mapCheckingCol] == 1)
                     {
                         GL.Color3(1f, 0f, 0f);
                         GL.LineWidth(1f);
-                        GL.Begin(PrimitiveType.Triangles);
-                        GL.Vertex2(tempPlayerPositionX, tempPlayerPositionY);
-                        GL.Vertex2(tempPlayerPositionX + tempPositionX, tempPlayerPositionY);
-                        GL.Vertex2(tempPlayerPositionX + tempPositionX, tempPlayerPositionY - tempPositionY);
-                        GL.End();
-
-                        GL.Color3(1f, 0f, 0f);
-                        GL.LineWidth(1f);
                         GL.Begin(PrimitiveType.Lines);
                         GL.Vertex2(player.Position.X, player.Position.Y);
-                        GL.Vertex2(player.Position.X + playerDeltaMovementX * 1000, player.Position.Y + playerDeltaMovementY * 1000);
+                        GL.Vertex2(tempPlayerPositionX + tempOffsetX, tempPlayerPositionY - tempOffsetY);
                         GL.End();
                         isVerticalFound = true;
                     }
-                    else
-                    {
-                        
-                        GL.Color3(1f, 0f, 0f);
-                        GL.LineWidth(1f);
-                        GL.Begin(PrimitiveType.Triangles);
-                        GL.Vertex2(tempPlayerPositionX, tempPlayerPositionY);
-                        GL.Vertex2(tempPlayerPositionX + tempPositionX, tempPlayerPositionY);
-                        GL.Vertex2(tempPlayerPositionX + tempPositionX, tempPlayerPositionY - tempPositionY);
-                        GL.End();
-
-                        Console.WriteLine("=================================");
-                        Console.WriteLine("Kör: " + tempIterator);
-                        Console.WriteLine("tempPlayerPositionX: " + tempPlayerPositionX);
-                        Console.WriteLine("tempPlayerPositionY: " + tempPlayerPositionY);
-                        Console.WriteLine("tempPositionX: " + tempPositionX);
-                        Console.WriteLine("tempPositionY: " + tempPositionY);
-
-                        tempIterator += 1;
-
-                        //Amennyivel eltoljuk az X-et
-                        tempPositionX = tileSize;
-                        //Y ahonna rajzolunk
-                        tempPlayerPositionY -= (tileSize * (float)Math.Tan((2 * PI) - playerViewAngle));
-                        //X ahonnan rajzolunk
-                        tempPlayerPositionX += tileSize - (tempPlayerPositionX % tileSize);
-                        //Amennyivel eltoljuk az Y-t
-                        tempPositionY += tileSize * (float)Math.Tan((2 * PI) - playerViewAngle);
-                        mapCheckingCol += 1;
-                    }
+                    tempOffsetX = tileSize;
+                    tempPlayerPositionX += tileSize - (tempPlayerPositionX % tileSize);
+                    tempPlayerPositionY -= tempOffsetY;
+                    tempOffsetY = tempOffsetX * (float)Math.Tan((2 * PI) - playerViewAngle);
                 };
 
                 DebugScreen.SwapBuffers();
