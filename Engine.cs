@@ -33,7 +33,7 @@ class Engine
         float playerDeltaX = 1f;
         float playerDeltaY = 0f;
         float movementSpeed = 100f;
-        float playerViewAngle = 0f;
+        float playerAngle = 0f;
         float rotationSpeed = 2f;
 
         //DeltaTime
@@ -72,41 +72,41 @@ class Engine
                 //Strife left
                 if (keyboard.IsKeyDown(Key.A))
                 {
-                    playerViewAngle -= rotationSpeed * deltaTime;
-                    //If something is wrong in the future with rotation and wallchecking, change this to playerViewAngle -= 0.1f;
-                    if (playerViewAngle < 0)
+                    playerAngle -= rotationSpeed * deltaTime;
+                    //If something is wrong in the future with rotation and wallchecking, change this to playerAngle -= 0.1f;
+                    if (playerAngle < 0)
                     {
-                        playerViewAngle += (2 * PI);
+                        playerAngle += (2 * PI);
                     }
-                    playerDeltaMovementX = (float)Math.Cos(playerViewAngle);
-                    playerDeltaMovementY = (float)Math.Sin(playerViewAngle);
+                    playerDeltaMovementX = (float)Math.Cos(playerAngle);
+                    playerDeltaMovementY = (float)Math.Sin(playerAngle);
                 };
 
                 //Strife right
                 if (keyboard.IsKeyDown(Key.D))
                 {
-                    playerViewAngle += rotationSpeed * deltaTime;
-                    //If something is wrong in the future with rotation and wallchecking, change this to playerViewAngle += 0.1f;
-                    if (playerViewAngle > (2 * PI))
+                    playerAngle += rotationSpeed * deltaTime;
+                    //If something is wrong in the future with rotation and wallchecking, change this to playerAngle += 0.1f;
+                    if (playerAngle > (2 * PI))
                     {
-                        playerViewAngle -= (2 * PI);
+                        playerAngle -= (2 * PI);
                     }
-                    playerDeltaMovementX = (float)Math.Cos(playerViewAngle);
-                    playerDeltaMovementY = (float)Math.Sin(playerViewAngle);
+                    playerDeltaMovementX = (float)Math.Cos(playerAngle);
+                    playerDeltaMovementY = (float)Math.Sin(playerAngle);
                 };
 
                 //Forward
                 if (keyboard.IsKeyDown(Key.W))
                 {
-                    player.Position.X += (float)Math.Cos(playerViewAngle) * deltaMovementSpeed;
-                    player.Position.Y += (float)Math.Sin(playerViewAngle) * deltaMovementSpeed;
+                    player.Position.X += (float)Math.Cos(playerAngle) * deltaMovementSpeed;
+                    player.Position.Y += (float)Math.Sin(playerAngle) * deltaMovementSpeed;
                 };
 
                 //Backward
                 if (keyboard.IsKeyDown(Key.S))
                 {
-                    player.Position.X -= (float)Math.Cos(playerViewAngle) * deltaMovementSpeed;
-                    player.Position.Y -= (float)Math.Sin(playerViewAngle) * deltaMovementSpeed;
+                    player.Position.X -= (float)Math.Cos(playerAngle) * deltaMovementSpeed;
+                    player.Position.Y -= (float)Math.Sin(playerAngle) * deltaMovementSpeed;
                 };
 
                 GL.ClearColor(0.6f, 0.6f, 0.6f, 1f);
@@ -122,31 +122,35 @@ class Engine
                 tempPlayerPositionX = player.Position.X;
                 tempPlayerPositionY = player.Position.Y;
                 tempOffsetX = tileSize - (tempPlayerPositionX % tileSize);
-                tempOffsetY = (tileSize - (player.Position.X % tileSize)) * (float)Math.Tan((2 * PI) - playerViewAngle);
+                tempOffsetY = (tileSize - (player.Position.X % tileSize)) * (float)Math.Tan((2 * PI) - playerAngle);
 
                 int mapCheckingRow = (int)(player.Position.Y / tileSize);
                 int mapCheckingCol = (int)(player.Position.X / tileSize);
 
-                //If view angle is between 0 and PI/2 (1. quadrant)
-                while (mapCheckingCol < map.GetLength(1) && !isVerticalFound)
-                {
-                    mapCheckingRow = (int)((tempPlayerPositionY - tempOffsetY) / tileSize);
-                    mapCheckingCol = (int)((tempPlayerPositionX + tempOffsetX) / tileSize);
-                    if (map[mapCheckingRow, mapCheckingCol] == 1)
+
+                if (playerAngle > 0f && ((2 * PI) - playerAngle) < (PI / 2)) {
+                    while (!isVerticalFound)
                     {
-                        GL.Color3(1f, 0f, 0f);
-                        GL.LineWidth(1f);
-                        GL.Begin(PrimitiveType.Lines);
-                        GL.Vertex2(player.Position.X, player.Position.Y);
-                        GL.Vertex2(tempPlayerPositionX + tempOffsetX, tempPlayerPositionY - tempOffsetY);
-                        GL.End();
-                        isVerticalFound = true;
-                    }
-                    tempOffsetX = tileSize;
-                    tempPlayerPositionX += tileSize - (tempPlayerPositionX % tileSize);
-                    tempPlayerPositionY -= tempOffsetY;
-                    tempOffsetY = tempOffsetX * (float)Math.Tan((2 * PI) - playerViewAngle);
-                };
+                        if (mapCheckingCol < map.GetLength(1) && mapCheckingRow > 0) {
+                            if (map[mapCheckingRow, mapCheckingCol] == 1)
+                            {
+                                GL.Color3(1f, 0f, 0f);
+                                GL.LineWidth(1f);
+                                GL.Begin(PrimitiveType.Lines);
+                                GL.Vertex2(player.Position.X, player.Position.Y);
+                                GL.Vertex2(tempPlayerPositionX + tempOffsetX, tempPlayerPositionY - tempOffsetY);
+                                GL.End();
+                                isVerticalFound = true;
+                            }
+                            tempOffsetX = tileSize;
+                            tempPlayerPositionX += tileSize - (tempPlayerPositionX % tileSize);
+                            tempPlayerPositionY -= tempOffsetY;
+                            tempOffsetY = tempOffsetX * (float)Math.Tan((2 * PI) - playerAngle);
+                            mapCheckingRow = (int)((tempPlayerPositionY - tempOffsetY) / tileSize);
+                            mapCheckingCol = (int)((tempPlayerPositionX + tempOffsetX) / tileSize);
+                        }
+                    };
+                }
 
                 DebugScreen.SwapBuffers();
             };
